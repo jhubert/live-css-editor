@@ -1,11 +1,7 @@
 <html>
 <head>
 <script>
-  // Called when the user clicks on the browser action.
-  chrome.browserAction.onClicked.addListener(function(tab) {
-    chrome.tabs.executeScript(null, {file: "css_editor.min.js"});
-    chrome.tabs.insertCSS(null, {file: "css_editor.css"});
-  });
+  function setItem(a,b){try{window.localStorage.removeItem(a);window.localStorage.setItem(a,b)}catch(c){}}function getItem(a){var b;try{b=window.localStorage.getItem(a)}catch(c){b="false"}return b}function clearStorage(){window.localStorage.clear()}function injectEditor(){if(typeof localStorage.warn==="undefined"){setItem("warn","true")}if(typeof localStorage.save==="undefined"){setItem("save","true")}if(typeof localStorage.keycode==="undefined"){setItem("keycode",69)}chrome.tabs.executeScript(null,{file:"css_editor.min.js"});chrome.tabs.insertCSS(null,{file:"css_editor.css"});var c=getItem("warn")==="true"?true:false,b=getItem("save")==="true"?true:false,a="LiveCSSEditor({ warn : "+c+", save : "+b+" });";chrome.tabs.executeScript(null,{code:a})}function cleanupEditor(){chrome.tabs.executeScript(null,{file:"remove_editor.js"})}chrome.extension.onRequest.addListener(function(c,b,a){if(c.settings){a({setting:c.settings,value:getItem(c.settings)});return}if(c.start){injectEditor()}if(c.stop){if(getItem("save")!=="true"&&getItem("warn")==="true"&&!confirm("Are you sure?")){return}cleanupEditor()}a({})});chrome.browserAction.onClicked.addListener(function(a){injectEditor()});
 </script>
 </head>
 </html>
