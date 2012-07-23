@@ -1,0 +1,44 @@
+require 'json'
+require 'uglifier'
+require 'nokogiri'
+
+SOURCE_DIRECTORY = 'package/'
+
+task :default => [:package]
+
+task :package do
+  # Read the manifest file
+  manifest = JSON.parse(File.read("#{SOURCE_DIRECTORY}manifest.json"))
+
+  # Remove the existing packaged zip
+  sh "rm package-#{manifest['version']}.zip"
+
+  # Copy the source directory to the tmp directory
+  sh "cp -r #{SOURCE_DIRECTORY} tmp/"
+
+  # Minify JS files
+  Dir['tmp/*.js'].each do |f|
+    content = Uglifier.compile(File.read(f))
+    File.open(f, 'w') { |o| o.write(content) }
+  end
+
+  # Minify inline JS
+  Dir['tmp/*.html'].each do |f|
+    input = File.read(f)
+
+    doc = Nokogiri::HTML(input)
+
+    doc.css('script').each do |script|
+      content = Uglifier.compile(script.content)
+      script.content = content
+    end
+
+    File.open(f, 'w') { |o| o.write(doc.to_s) }
+  end
+
+  # Create the packaged zip file
+  sh "zip package-#{manifest['version']}.zip tmp/*"
+
+  # Remove the tmp dir
+  # sh 'rm -Rf tmp/'
+end

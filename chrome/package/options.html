@@ -1,6 +1,5 @@
 <html>
 <head>
-  <!-- Source File -->
   <title>Live CSS Edit Options</title>
   <style type="text/css" media="screen">
     /*
@@ -12,7 +11,7 @@
     */
     html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
 
-    /* Written by Jeremy Hubert */
+    /* Written by Jeremy Baker */
     body { font-family: arial; font-size: 13px; padding: 15px; }
     fieldset { padding: 1em; border-width: 0; border-top: 1px solid #ccc; background-color: #efefef; margin-bottom: 5px; }
     label { padding-right: 10px;  }
@@ -21,29 +20,200 @@
     input[type="text"] { width: 6em; padding: 4px; }
   </style>
   <script type="text/javascript">
-  var keyCommand,warn,save,keyString,keyValue,warnYes,warnNo,saveYes,saveNo,charMap={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",19:"pause/break",20:"caps lock",27:"escape",33:"page up",34:"page down",35:"end",36:"home",37:"left arrow",38:"up arrow",39:"right arrow",40:"down arrow",45:"insert",46:"delete",91:"left window",92:"right window",93:"select key",96:"numpad 0",97:"numpad 1",98:"numpad 2",99:"numpad 3",100:"numpad 4",101:"numpad 5",102:"numpad 6",103:"numpad 7",104:"numpad 8",105:"numpad 9",106:"multiply",107:"add",109:"subtract",110:"decimal point",111:"divide",112:"F1",113:"F2",114:"F3",115:"F4",116:"F5",117:"F6",118:"F7",119:"F8",120:"F9",121:"F10",122:"F11",123:"F12",144:"num lock",145:"scroll lock",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"};function stringFromCharCode(a){return charMap[a]||String.fromCharCode(a)}function save_options(){localStorage.keycode=keyValue.value;if(warnYes.checked){localStorage.warn=true}else{localStorage.warn=false}if(saveYes.checked){localStorage.save=true}else{localStorage.save=false}alert("Changes Saved");window.close()}function restore_options(){if(typeof save==="undefined"){save=true}if(typeof warn==="undefined"){warn=true}if(typeof keyCommand==="undefined"){keyCommand=69}keyString.value=stringFromCharCode(keyCommand);keyValue.value=keyCommand;if(warn==="true"){warnYes.checked=true}else{warnNo.checked=true}if(save==="true"){saveYes.checked=true}else{saveNo.checked=true}}function init(){keyCommand=localStorage.keycode;warn=localStorage.warn;save=localStorage.save;keyString=document.getElementById("keycode-string");keyValue=document.getElementById("keycode-value");warnYes=document.getElementById("warn-yes");warnNo=document.getElementById("warn-no");saveYes=document.getElementById("save-yes");saveNo=document.getElementById("save-no");restore_options()}function getKeyCode(a){keyString.value=stringFromCharCode(a.keyCode);keyValue.value=a.keyCode;return false};
+    var keyCommand, warn, save, modify, keyString, keyValue, warnYes, warnNo, saveYes, saveNo, modifyYes, modifyNo, charMap = {
+      8 : "backspace",
+      9 : "tab",
+      13 : "enter",
+      16 : "shift",
+      17 : "ctrl",
+      18 : "alt",
+      19 : "pause/break",
+      20 : "caps lock",
+      27 : "escape",
+      33 : "page up",
+      34 : "page down",
+      35 : "end",
+      36 : "home",
+      37 : "left arrow",
+      38 : "up arrow",
+      39 : "right arrow",
+      40 : "down arrow",
+      45 : "insert",
+      46 : "delete",
+      91 : "left window",
+      92 : "right window",
+      93 : "select key",
+      96 : "numpad 0",
+      97 : "numpad 1",
+      98 : "numpad 2",
+      99 : "numpad 3",
+      100 : "numpad 4",
+      101 : "numpad 5",
+      102 : "numpad 6",
+      103 : "numpad 7",
+      104 : "numpad 8",
+      105 : "numpad 9",
+      106 : "multiply",
+      107 : "add",
+      109 : "subtract",
+      110 : "decimal point",
+      111 : "divide",
+      112 : "F1",
+      113 : "F2",
+      114 : "F3",
+      115 : "F4",
+      116 : "F5",
+      117 : "F6",
+      118 : "F7",
+      119 : "F8",
+      120 : "F9",
+      121 : "F10",
+      122 : "F11",
+      123 : "F12",
+      144 : "num lock",
+      145 : "scroll lock",
+      186 : ";",
+      187 : "=",
+      188 : ",",
+      189 : "-",
+      190 : ".",
+      191 : "/",
+      192 : "`",
+      219 : "[",
+      220 : "\\",
+      221 : "]",
+      222 : "'"
+    };
+
+    function stringFromCharCode(code) {
+      return charMap[code] || String.fromCharCode(code);
+    }
+
+    // Saves options to localStorage.
+    function save_options() {
+      localStorage["keycode"] = keyValue.value;
+
+      if (warnYes.checked) {
+        localStorage["warn"] = true;
+      } else {
+        localStorage["warn"] = false;
+      }
+
+      if (saveYes.checked) {
+        localStorage["save"] = true;
+      } else {
+        localStorage["save"] = false;
+      }
+
+      if (modifyYes.checked) {
+        localStorage["modify"] = true;
+      } else {
+        localStorage["modify"] = false;
+      }
+
+      alert('Changes Saved');
+      window.close();
+    }
+
+    // Restores select box state to saved value from localStorage.
+    function restore_options() {
+      if (typeof save === "undefined") {
+        save = true;
+      }
+
+      if (typeof warn === "undefined") {
+        warn = true;
+      }
+
+      if (typeof modify === "undefined") {
+        modify = true;
+      }
+
+      if (typeof keyCommand === "undefined") {
+        keyCommand = 69;
+      }
+
+      keyString.value = stringFromCharCode(keyCommand);
+      keyValue.value = keyCommand;
+
+      if (warn === "true") {
+        warnYes.checked = true;
+      } else {
+        warnNo.checked = true;
+      }
+
+      if (save === "true") {
+        saveYes.checked = true;
+      } else {
+        saveNo.checked = true;
+      }
+
+      if (modify === "true") {
+        modifyYes.checked = true;
+      } else {
+        modifyNo.checked = true;
+      }
+    }
+
+    function init() {
+      keyCommand = localStorage["keycode"];
+      warn = localStorage["warn"];
+      save = localStorage["save"];
+      modify = localStorage["modify"];
+      keyString = document.getElementById('keycode-string');
+      keyValue = document.getElementById('keycode-value');
+      warnYes = document.getElementById('warn-yes');
+      warnNo = document.getElementById('warn-no');
+      saveYes = document.getElementById('save-yes');
+      saveNo = document.getElementById('save-no');
+      modifyYes = document.getElementById('modify-yes');
+      modifyNo = document.getElementById('modify-no');
+
+      restore_options();
+    }
+
+    function getKeyCode(e) {
+      keyString.value = stringFromCharCode(e.keyCode);
+      keyValue.value = e.keyCode;
+      return false;
+    }
   </script>
 </head>
 <body onload="init()">
 
-<h1>Live CSS Edit Options</h1>
+<h1 data-message="optionsHeader">Live CSS Edit Options</h1>
 
 <fieldset>
-  <p><label for="keycode-string">Key Command for opening the editor:</label></p>
-  Command + Shift + <input type="text" id="keycode-string" onkeydown="return getKeyCode(event);"> <input type="hidden" id="keycode-value">
+  <p><label for="keycode-string" data-message="optionsKeyCommandLabel">Key Command for opening the editor:</label></p>
+  <span data-message="optionsKeyCommandKeys">Command + Shift + </span><input type="text" id="keycode-string" onkeydown="return getKeyCode(event);"> <input type="hidden" id="keycode-value">
 </fieldset>
 
 <fieldset>
-  <p>Warn before closing the editor:</p>
-  <input type="radio" name="warn" id="warn-yes"> <label for="warn-yes">Yes</label>  <input type="radio" name="warn" id="warn-no"> <label for="warn-no">No</label>
+  <p data-message="optionsWarnLabel">Warn before closing the editor:</p>
+  <input type="radio" name="warn" id="warn-yes"> <label for="warn-yes" data-message="optionsYes">Yes</label>
+  <input type="radio" name="warn" id="warn-no"> <label for="warn-no" data-message="optionsNo">No</label>
 </fieldset>
 
 <fieldset>
-  <p>Save your css even when you reload or leave the page:</p>
-  <input type="radio" name="save" id="save-yes"> <label for="save-yes">Yes</label>
-  <input type="radio" name="save" id="save-no"> <label for="save-no">No</label>
+  <p data-message="optionsSaveLabel">Save your css even when you reload or leave the page:</p>
+  <input type="radio" name="save" id="save-yes"> <label for="save-yes" data-message="optionsYes">Yes</label>
+  <input type="radio" name="save" id="save-no"> <label for="save-no" data-message="optionsNo">No</label>
 </fieldset>
 
-<p><button onclick="save_options()">Save</button></p>
+<fieldset>
+  <p data-message="optionsModifyLabel">Load the CSS you've written when you visit the page again:</p>
+  <input type="radio" name="modify" id="modify-yes"> <label for="modify-yes" data-message="optionsYes">Yes</label>
+  <input type="radio" name="modify" id="modify-no"> <label for="modify-no" data-message="optionsNo">No</label>
+</fieldset>
+
+<p><button onclick="save_options()" data-message="optionsSaveButton">Save</button></p>
+<script type="text/javascript" charset="utf-8">
+  var objects = document.getElementsByTagName('*'), i;
+  for(i = 0; i < objects.length; i++) {
+    if (objects[i].dataset && objects[i].dataset.message) {
+      objects[i].innerHTML = chrome.i18n.getMessage(objects[i].dataset.message);
+    }
+  }
+</script>
 </body>
 </html>

@@ -1,0 +1,21 @@
+{
+  "extName": { "message": "Live CSS Editor", "description": "The name of this extension." },
+  "extDescription": { "message": "Live Write CSS onto any page", "description": "The description of this extension." },
+  "extBrowserActionName": { "message": "Enable the editor", "description": "The text shown to the user when they hover over the browser action button." },
+  "editorTitle": { "message": "Live CSS Editor", "description": "The text shown on the actual editor." },
+  "warningOnClose": { "message": "Are you sure you want to do this? All of your changes will be lost.", "description": "The warning that is shown to the user if they close the editor with content in it." },
+  "optionsHeader": { "message": "Live CSS Editor Options", "description": "The headline at the top of the options page" },
+  "optionsKeyCommandLabel": { "message": "What key command would you like to use to open the editor?", "description": "The label for the key command option" },
+  "optionsKeyCommandKeys": { "message": "Command + Shift + ", "description": "The other keys that need to be pressed to trigger the editor. Always the Command and Shift keys" },
+  "optionsWarnLabel": { "message": "Should the editor warn you before closing?", "description": "The label for the warning option" },
+  "optionsSaveLabel": { "message": "Should the editor remember your CSS for a page even when you close it?", "description": "The label for the save option" },
+  "optionsModifyLabel": { "message": "Should the CSS you wrote for a page be remembered and loaded when you visit?", "description": "The label for the modify option" },
+  "optionsYes": { "message": "Yes", "description": "A confirmation word" },
+  "optionsNo": { "message": "No", "description": "A rejection word" },
+  "optionsSaveButton": { "message": "Save Changes", "description": "The text on top of the save button" },
+  "optionsAlertSaved": { "message": "Your changes have been saved", "description": "A notification that the changes have been saved" },
+  "buttonLabelClose": { "message": "Close Editor", "description": "The hover text for the close button" },
+  "buttonLabelBottom": { "message": "Toggle top / bottom position", "description": "The hover text for the top/bottom position button" },
+  "buttonLabelLeftRight": { "message": "Toggle left / right position", "description": "The hover text for the left/right position button" },
+  "buttonLabelReset": { "message": "Reset the box size", "description": "The hover text for the reset box size button" }
+}

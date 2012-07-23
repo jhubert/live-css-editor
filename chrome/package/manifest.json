@@ -1,9 +1,10 @@
 {
-  "name": "Live CSS Editor",
-  "version": "1.0",
+  "name": "__MSG_extName__",
+  "version": "1.7.0",
   "background_page": "bg.html",
   "options_page": "options.html",
-  "description": "Live Write CSS onto any page",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   "permissions": [
     "tabs", "<all_urls>"
   ],
@@ -13,9 +14,10 @@
   }],
   "browser_action": {
     "default_icon": "icon-color.png",
-    "name": "Enable the editor"
+    "default_text": "none",
+    "name": "__MSG_extBrowserActionName__"
   },
-  "icons": { 
+  "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
