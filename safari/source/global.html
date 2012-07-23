@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>Live CSS Editor</title>
+<script>
+  function getItem(key) {
+    return safari.extension.settings[key];
+  }
+
+  function sendResponse(data) {
+    safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("LiveCSSEditor", data);
+  }
+
+  function toggleEditor() {
+    sendResponse({
+      command: "toggle",
+      warn: getItem('warn'),
+      save: getItem('save'),
+      modify: getItem('modify')
+    });
+  }
+
+  function handleCommand(request) {
+    if (request.command === 'toggle') {
+      toggleEditor();
+    }
+  }
+
+  function waitForMessage(request) {
+    if (request.name == "settings") {
+      sendResponse({ command: "settings", setting : request.message.settings, value : getItem(request.message.settings) });
+      return;
+    }
+
+    if (request.name == "modify") {
+      if (getItem('modify')) {
+        sendResponse({ command: "loadExistingStyles" });
+      }
+      return;
+    }
+
+    if (request.name == "toggle") {
+      toggleEditor();
+    }
+  }
+
+  safari.application.addEventListener("command", handleCommand, false);
+
+  safari.application.activeBrowserWindow.activeTab.addEventListener("message", waitForMessage, false);
+</script>
+</head>
+</html>

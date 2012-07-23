@@ -10,11 +10,11 @@
        <key>Developer Identifier</key>
        <string>6ULL56D9UV</string>
        <key>CFBundleVersion</key>
-       <string>1.1</string>
+       <string>1.7.0</string>
        <key>CFBundleShortVersionString</key>
-       <string>1.1</string>
+       <string>1.7.0</string>
        <key>URL</key>
-       <string>http://www.livecsseditor.com/LiveCSSEditor.safariextz</string>
+       <string>http://www.livecsseditor.com/dl/LiveCSSEditor-1.7.0.safariextz</string>
      </dict>
    </array>
 </dict>
