@@ -1,3 +1,4 @@
+/* Set up the key commands based on the keycode setting */
 chrome.extension.sendRequest({ settings : 'keycode' }, function (response) {
   var keyCommand = response && parseInt(response.value, 0);
 
@@ -15,6 +16,7 @@ chrome.extension.sendRequest({ settings : 'keycode' }, function (response) {
   }, false);
 });
 
+/* Tell the extension to load the existing CSS if there is any */
 (function () {
   var url = document.location,
     css = window.localStorage.getItem('livecsseditor-cache-' + url);
