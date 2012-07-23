@@ -2,7 +2,7 @@ require 'json'
 require 'uglifier'
 require 'nokogiri'
 
-SOURCE_DIRECTORY = 'package/'
+SOURCE_DIRECTORY = 'source/'
 
 task :default => [:package]
 
@@ -40,5 +40,5 @@ task :package do
   sh "zip package-#{manifest['version']}.zip tmp/*"
 
   # Remove the tmp dir
-  # sh 'rm -Rf tmp/'
+  sh 'rm -Rf tmp/'
 end
