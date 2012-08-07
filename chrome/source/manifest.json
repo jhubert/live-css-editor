@@ -1,7 +1,10 @@
 {
   "name": "__MSG_extName__",
-  "version": "1.7.0",
-  "background_page": "bg.html",
+  "manifest_version": 2,
+  "version": "1.7.1",
+  "background": {
+    "page": "bg.html"
+  },
   "options_page": "options.html",
   "description": "__MSG_extDescription__",
   "default_locale": "en",

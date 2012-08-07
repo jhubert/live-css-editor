@@ -11,19 +11,19 @@ task :package do
   manifest = JSON.parse(File.read("#{SOURCE_DIRECTORY}manifest.json"))
 
   # Remove the existing packaged zip
-  sh "rm package-#{manifest['version']}.zip"
+  sh "rm package-*.zip"
 
-  # Copy the source directory to the tmp directory
-  sh "cp -r #{SOURCE_DIRECTORY} tmp/"
+  # Copy the source directory to the build directory
+  sh "cp -r #{SOURCE_DIRECTORY} build/"
 
   # Minify JS files
-  Dir['tmp/*.js'].each do |f|
+  Dir['build/*.js'].each do |f|
     content = Uglifier.compile(File.read(f))
     File.open(f, 'w') { |o| o.write(content) }
   end
 
   # Minify inline JS
-  Dir['tmp/*.html'].each do |f|
+  Dir['build/*.html'].each do |f|
     input = File.read(f)
 
     doc = Nokogiri::HTML(input)
@@ -37,8 +37,8 @@ task :package do
   end
 
   # Create the packaged zip file
-  sh "zip package-#{manifest['version']}.zip tmp/*"
+  sh "zip -r package-#{manifest['version']}.zip build -x '*.DS_Store'"
 
-  # Remove the tmp dir
-  sh 'rm -Rf tmp/'
+  # Remove the build dir
+  sh 'rm -Rf build/'
 end
