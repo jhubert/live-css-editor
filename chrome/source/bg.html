@@ -45,7 +45,7 @@
       modify = getItem('modify') === "true" ? true : false,
       code = "LiveCSSEditor({ warn : " + warn + ", save : " + save + ", modify : " + modify + " });";
 
-    chrome.tabs.executeScript(null, {file: "css_editor.min.js"}, function (response) {
+    chrome.tabs.executeScript(null, {file: "css_editor.js"}, function (response) {
       chrome.tabs.executeScript(null, {code: code});
     });
   }
