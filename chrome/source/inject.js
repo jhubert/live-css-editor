@@ -1,5 +1,5 @@
 /* Set up the key commands based on the keycode setting */
-chrome.extension.sendRequest({ settings : 'keycode' }, function (response) {
+chrome.extension.sendMessage({ settings : 'keycode' }, function (response) {
   var keyCommand = response && parseInt(response.value, 0);
 
   window.addEventListener("keydown", function(event) {
@@ -8,9 +8,9 @@ chrome.extension.sendRequest({ settings : 'keycode' }, function (response) {
 
     if (modifier && event.shiftKey && event.keyCode == keyCommand) {
       if (document.getElementById('LiveCSSEditor-panel')) {
-        chrome.extension.sendRequest({ stop : true }, function(response) {});
+        chrome.extension.sendMessage({ stop : true }, function(response) {});
       } else {
-        chrome.extension.sendRequest({ start : true }, function(response) {});
+        chrome.extension.sendMessage({ start : true }, function(response) {});
       }
     }
   }, false);
@@ -22,6 +22,6 @@ chrome.extension.sendRequest({ settings : 'keycode' }, function (response) {
     css = window.localStorage.getItem('livecsseditor-cache-' + url);
 
   if (css && css !== '') {
-    chrome.extension.sendRequest({ modify : 'true' }, function (response) {});
+    chrome.extension.sendMessage({ modify : 'true' }, function (response) {});
   }
 }());
