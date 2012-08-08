@@ -42,3 +42,34 @@ task :package do
   # Remove the build dir
   sh 'rm -Rf build/'
 end
+
+task :test do
+  # Remove the test dir
+  sh 'rm -Rf test/'
+
+  # Read the manifest file
+  manifest = JSON.parse(File.read("#{SOURCE_DIRECTORY}manifest.json"))
+
+  # Copy the source directory to the build directory
+  sh "cp -r #{SOURCE_DIRECTORY} test/"
+
+  # Minify JS files
+  Dir['test/*.js'].each do |f|
+    content = Uglifier.compile(File.read(f))
+    File.open(f, 'w') { |o| o.write(content) }
+  end
+
+  # Minify inline JS
+  Dir['test/*.html'].each do |f|
+    input = File.read(f)
+
+    doc = Nokogiri::HTML(input)
+
+    doc.css('script').each do |script|
+      content = Uglifier.compile(script.content)
+      script.content = content
+    end
+
+    File.open(f, 'w') { |o| o.write(doc.to_s) }
+  end
+end
