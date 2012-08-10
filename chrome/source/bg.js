@@ -63,7 +63,7 @@ chrome.extension.onMessage.addListener(
     }
     if (request.modify) {
       if (getItem('modify') === 'true') {
-        chrome.browserAction.setBadgeText ( { text: "*" } );
+        chrome.browserAction.setBadgeText ( { text: "*", tabId: sender.tab.id } );
         loadExistingStyles();
       }
       sendResponse({});
