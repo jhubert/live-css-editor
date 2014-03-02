@@ -8,7 +8,31 @@ var LiveCSSEditor = function (settings) {
   var cssCache = '',
     timer = null,
     tab = '  ',
-    urlKey = document.location;
+    urlKey = document.location,
+    cssPrefix = 'LiveCSSEditor-';
+
+  // Utility Functions
+  function hasClass(el, name) {
+    name = cssPrefix + name;
+    return new RegExp('(\\s|^)'+name+'(\\s|$)').test(el.className);
+  }
+
+  function addClass(el, name) {
+    if (!hasClass(el, name)) {
+      name = cssPrefix + name;
+      el.className += (el.className ? ' ' : '') +name;
+    }
+  }
+
+  function removeClass(el, name) {
+    if (hasClass(el, name)) {
+      name = cssPrefix + name;
+      var newName = el.className;
+      newName = newName.replace(new RegExp('(\\s|^)'+name+'(\\s|$)'),' ');
+      newName = newName.replace(/^\s+|\s+$/g, '');
+      el.className = newName;
+    }
+  }
 
   function handleTabInTextarea(evt) {
     var t = evt.target,
@@ -78,8 +102,8 @@ var LiveCSSEditor = function (settings) {
     }
   }
 
-  function get(id) {
-    return document.getElementById('LiveCSSEditor-' + id);
+  function getEl(id) {
+    return document.getElementById(cssPrefix + id);
   }
 
   function getStorage(key) {
@@ -100,35 +124,37 @@ var LiveCSSEditor = function (settings) {
   }
 
   function toggleBottom() {
-    var panel = get('panel'), position;
+    var panel = getEl('panel'), position;
 
     if (panel.className.indexOf('bottom') === -1) {
-      panel.className += ' bottom';
       position = 'bottom';
+      addClass(panel, 'bottom');
     } else {
-      panel.className = panel.className.replace(' bottom', '');
       position = 'top';
+      removeClass(panel, 'bottom');
     }
 
     setStorage('position', position);
   }
 
   function toggleLeftRight() {
-    var panel = get('panel'), position;
+    var panel = getEl('panel'), position;
 
-    if (panel.className.indexOf('right') === -1) {
-      position = 'right';
-      panel.className = panel.className.replace('left', 'right');
-    } else {
+    if (hasClass(panel, 'right')) {
       position = 'left';
-      panel.className = panel.className.replace('right', 'left');
+      removeClass(panel, 'right');
+      addClass(panel, 'left');
+    } else {
+      position = 'right';
+      removeClass(panel, 'left');
+      addClass(panel, 'right');
     }
 
     setStorage('positionLR', position);
   }
 
   function resetBoxSize() {
-    var code = get('code');
+    var code = getEl('code');
 
     code.style.width = '';
     code.style.height = '';
@@ -138,7 +164,7 @@ var LiveCSSEditor = function (settings) {
   }
 
   function resetCSSTag() {
-    var css = get('PageCSS');
+    var css = getEl('PageCSS');
 
     if (!settings.modify) {
       css.parentElement.removeChild(css);
@@ -146,7 +172,7 @@ var LiveCSSEditor = function (settings) {
   }
 
   function removeEditor() {
-    var panel = get('panel'), code = get('code');
+    var panel = getEl('panel'), code = getEl('code');
 
     if (settings.save !== true && settings.warn === true && code.value !== '') {
       if (!confirm(chrome.i18n.getMessage("warningOnClose"))) {
@@ -162,11 +188,11 @@ var LiveCSSEditor = function (settings) {
   }
 
   function activateButtons() {
-    var bottomButton = get('bot'),
-      closeButton = get('close'),
-      codeArea = get('code'),
-      resetButton = get('reset'),
-      leftRightButton = get('leftright');
+    var bottomButton = getEl('bot'),
+      closeButton = getEl('close'),
+      codeArea = getEl('code'),
+      resetButton = getEl('reset'),
+      leftRightButton = getEl('leftright');
 
     bottomButton.onclick = toggleBottom;
     closeButton.onclick = removeEditor;
@@ -175,23 +201,39 @@ var LiveCSSEditor = function (settings) {
     resetButton.onclick = resetBoxSize;
   }
 
+  function editorHtmlContent() {
+    return '\
+    <div id="LiveCSSEditor-actions">\
+      <div id="LiveCSSEditor-close">Close</div> \
+      <div id="LiveCSSEditor-bot">Bottom</div> \
+      <div id="LiveCSSEditor-leftright">Left / Right</div> \
+      <div id="LiveCSSEditor-reset">Reset</div> \
+    </div> \
+    <div id="LiveCSSEditor-pad"> \
+      <div id="LiveCSSEditor-label">' + chrome.i18n.getMessage("editorTitle") + '</div> \
+      <textarea id="LiveCSSEditor-code"></textarea> \
+    </div>\
+    ';
+  }
+
   function addEditorPane() {
     var objPanel = document.createElement('div'),
       boxsize = getStorage('boxsize') && getStorage('boxsize').split(','),
       code;
 
     objPanel.setAttribute('id', 'LiveCSSEditor-panel');
-    objPanel.className = 'right';
-    objPanel.innerHTML = '<div id="LiveCSSEditor-actions"><div id="LiveCSSEditor-close">Close</div><div id="LiveCSSEditor-bot">Bottom</div><div id="LiveCSSEditor-leftright">Left / Right</div><div id="LiveCSSEditor-reset">Reset</div></div><div id="LiveCSSEditor-pad"><div id="LiveCSSEditor-label">' + chrome.i18n.getMessage("editorTitle") + '</div><textarea id="LiveCSSEditor-code"></textarea></div>';
+    objPanel.innerHTML = editorHtmlContent();
 
     document.body.appendChild(objPanel);
 
-    code = get('code');
+    code = getEl('code');
 
     if (getStorage('position') === 'bottom') {
       toggleBottom();
     }
 
+    // Default to right side
+    addClass(objPanel, 'right');
     if (getStorage('positionLR') === 'left') {
       toggleLeftRight();
     }
@@ -220,7 +262,7 @@ var LiveCSSEditor = function (settings) {
   }
 
   function fillStyleTag(css) {
-    var obj = get('PageCSS');
+    var obj = getEl('PageCSS');
 
     css = css || '';
 
@@ -231,7 +273,7 @@ var LiveCSSEditor = function (settings) {
   }
 
   function autoUpdate() {
-    var source = get('code');
+    var source = getEl('code');
     /* Don't bother replacing the CSS if it hasn't changed */
     if (source) {
       if (cssCache === source.value) {
@@ -255,7 +297,7 @@ var LiveCSSEditor = function (settings) {
 
     css = getStorage('cache');
     if (css) {
-      source = get('code');
+      source = getEl('code');
       source.value = css;
     }
     fillStyleTag(css);
@@ -263,7 +305,7 @@ var LiveCSSEditor = function (settings) {
     startAutoUpdate();
   }
 
-  if (!get('panel')) {
+  if (!getEl('panel')) {
     init();
   } else {
     removeEditor();
