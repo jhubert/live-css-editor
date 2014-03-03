@@ -6,6 +6,7 @@ var LiveCSSEditor = function (settings) {
   settings = settings || { warn: true, save: true, modify: true };
 
   var cssCache = '',
+    keyupTimer = null,
     tab = '  ',
     urlKey = document.location,
     cssPrefix = 'LiveCSSEditor-';
@@ -195,7 +196,10 @@ var LiveCSSEditor = function (settings) {
     bottomButton.onclick = toggleBottom;
     closeButton.onclick = removeEditor;
     codeArea.onkeydown = handleTabInTextarea;
-    codeArea.onkeyup = updateCSSTag;
+    codeArea.onkeyup = function () {
+      keyupTimer && clearTimeout(keyupTimer);
+      keyupTimer = setTimeout(updateCSSTag, 100);
+    };
     leftRightButton.onclick = toggleLeftRight;
     resetButton.onclick = resetBoxSize;
   }
@@ -289,8 +293,8 @@ var LiveCSSEditor = function (settings) {
     addEditorPane();
 
     css = getStorage('cache');
-    if (css) {
-      source = getEl('code');
+    source = getEl('code');
+    if (css && source) {
       source.value = css;
     }
     fillStyleTag(css);
