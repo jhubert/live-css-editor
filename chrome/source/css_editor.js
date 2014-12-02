@@ -6,7 +6,7 @@ var LiveCSSEditor = function (settings) {
   settings = settings || { warn: true, save: true, modify: true };
 
   var cssCache = '',
-    timer = null,
+    keyupTimer = null,
     tab = '  ',
     urlKey = document.location,
     cssPrefix = 'LiveCSSEditor-';
@@ -182,7 +182,6 @@ var LiveCSSEditor = function (settings) {
 
     setStorage('boxsize', code.style.width + ',' + code.style.height);
 
-    clearInterval(timer);
     resetCSSTag();
     panel.parentElement.removeChild(panel);
   }
@@ -197,6 +196,10 @@ var LiveCSSEditor = function (settings) {
     bottomButton.onclick = toggleBottom;
     closeButton.onclick = removeEditor;
     codeArea.onkeydown = handleTabInTextarea;
+    codeArea.onkeyup = function () {
+      keyupTimer && clearTimeout(keyupTimer);
+      keyupTimer = setTimeout(updateCSSTag, 100);
+    };
     leftRightButton.onclick = toggleLeftRight;
     resetButton.onclick = resetBoxSize;
   }
@@ -272,7 +275,7 @@ var LiveCSSEditor = function (settings) {
     setStorage('cache', css);
   }
 
-  function autoUpdate() {
+  function updateCSSTag() {
     var source = getEl('code');
     /* Don't bother replacing the CSS if it hasn't changed */
     if (source) {
@@ -280,13 +283,7 @@ var LiveCSSEditor = function (settings) {
         return false;
       }
       fillStyleTag(source.value);
-    } else {
-      clearInterval(timer);
     }
-  }
-
-  function startAutoUpdate() {
-    timer = setInterval(autoUpdate, 1000);
   }
 
   function init() {
@@ -296,13 +293,13 @@ var LiveCSSEditor = function (settings) {
     addEditorPane();
 
     css = getStorage('cache');
-    if (css) {
-      source = getEl('code');
+    source = getEl('code');
+    if (css && source) {
       source.value = css;
     }
     fillStyleTag(css);
 
-    startAutoUpdate();
+    updateCSSTag();
   }
 
   if (!getEl('panel')) {
