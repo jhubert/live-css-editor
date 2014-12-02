@@ -20,6 +20,13 @@
     "default_text": "none",
     "name": "__MSG_extBrowserActionName__"
   },
+  "commands": {
+    "_execute_browser_action": {
+       "suggested_key": {
+          "default": "Ctrl+Shift+E"
+       }
+    }
+  },
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

@@ -1,89 +1,95 @@
-function setItem(key, value) {
-  try {
-    window.localStorage.removeItem(key);
-    window.localStorage.setItem(key, value);
-  } catch(e) {
+/*jslint browser: true, devel: true, maxerr: 50, indent: 2 */
+/*global chrome */
 
-  }
-}
+(function () {
+  "use strict";
 
-function getItem(key) {
-  var value;
-  try {
-    value = window.localStorage.getItem(key);
-  }catch(e) {
-    value = "false";
-  }
-  return value;
-}
-
-function clearStorage() {
-  window.localStorage.clear();
-}
-
-function injectEditor() {
-
-  if (typeof localStorage.warn === "undefined") {
-    setItem('warn', 'true');
+  function setItem(key, value) {
+    try {
+      window.localStorage.removeItem(key);
+      window.localStorage.setItem(key, value);
+    } catch (ignore) {}
   }
 
-  if (typeof localStorage.save === "undefined") {
-    setItem('save', 'true');
+  function getItem(key) {
+    var value;
+    try {
+      value = window.localStorage.getItem(key);
+    } catch (ignore) {}
+    return value;
   }
 
-  if (typeof localStorage.keycode === "undefined") {
-    setItem('keycode', 69);
-  }
-
-  chrome.tabs.insertCSS(null, {file: "css_editor.css"});
-
-  var warn = getItem('warn') === "true" ? true : false,
-    save = getItem('save') === "true" ? true : false,
-    modify = getItem('modify') === "true" ? true : false,
-    boxsize = getItem('boxsize'),
-    code = "LiveCSSEditor({ warn : " + warn + ", save : " + save + ", modify : " + modify + ", boxsize : '" + boxsize + "' });";
-
-  chrome.tabs.executeScript(null, {file: "css_editor.js"}, function (response) {
-    chrome.tabs.executeScript(null, {code: code});
-  });
-}
-
-function cleanupEditor() {
-  chrome.tabs.executeScript(null, {file: "remove_editor.js"});
-}
-
-function loadExistingStyles() {
-  chrome.tabs.executeScript(null, {file: "existing_styles.js"});
-}
-
-chrome.extension.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    if (request.settings) {
-      sendResponse({ setting : request.settings, value : getItem(request.settings) });
-      return;
+  function setupDefaults() {
+    if (!localStorage.hasOwnProperty('warn')) {
+      setItem('warn', 'true');
     }
-    if (request.modify) {
-      if (getItem('modify') === 'true') {
-        chrome.browserAction.setBadgeText ( { text: "*", tabId: sender.tab.id } );
-        loadExistingStyles();
+
+    if (!localStorage.hasOwnProperty('save')) {
+      setItem('save', 'true');
+    }
+  }
+
+  function injectEditor() {
+    setupDefaults();
+
+    chrome.tabs.insertCSS(null, {file: "css_editor.css"});
+
+    var options = {
+      warn: getItem('warn') === "true",
+      save: getItem('save') === "true",
+      modify: getItem('modify') === "true",
+      boxsize: getItem('boxsize') || ''
+    },
+    code = 'LiveCSSEditor(' + JSON.stringify(options) + ');';
+
+    chrome.tabs.executeScript(null, {file: "css_editor.js"}, function () {
+      chrome.tabs.executeScript(null, {code: code});
+    });
+  }
+
+  function loadExistingStyle(tabId) {
+    if (getItem('modify') === 'true') {
+      chrome.browserAction.setBadgeText({ text: "*", tabId: tabId });
+      chrome.tabs.executeScript(null, {file: "existing_styles.js"});
+    }
+  }
+
+  function handleFileSchemeAccess(isAllowedAccess) {
+    if (isAllowedAccess) {
+      injectEditor();
+    } else {
+      if (confirm(chrome.i18n.getMessage('errorFileURL'))) {
+        chrome.tabs.create({ url: 'chrome://extensions/?id=' + chrome.runtime.id });
+      }
+    }
+  }
+
+  chrome.extension.onMessage.addListener(
+    function (request, sender, sendResponse) {
+      if (request.modify) {
+        loadExistingStyle(sender.tab.id);
+      }
+      if (request.openExtensions) {
+        alert('hi');
       }
       sendResponse({});
+    }
+  );
+
+  // Called when the user clicks on the browser action.
+  chrome.browserAction.onClicked.addListener(function (tab) {
+    var url = tab.url;
+
+    if (url.indexOf('chrome') === 0) {
+      alert(chrome.i18n.getMessage('errorChromeURL'));
       return;
     }
-    if (request.start) {
+
+    if (url.indexOf('file:///') === 0) {
+      chrome.extension.isAllowedFileSchemeAccess(handleFileSchemeAccess);
+    } else {
       injectEditor();
     }
-    if (request.stop) {
-      if (getItem('save') !== "true" && getItem('warn') === "true" && !confirm('Are you sure?')) {
-        return;
-      }
-      cleanupEditor();
-    }
-    sendResponse({});
-  }
-);
+  });
 
-// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  injectEditor();
-});
+}());

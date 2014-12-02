@@ -1,182 +1,83 @@
-var keyCommand, warn, save, modify, keyString, keyValue, warnYes, warnNo, saveYes, saveNo, modifyYes, modifyNo, boxSize, boxSizeH, boxSizeW, charMap = {
-  8 : "backspace",
-  9 : "tab",
-  13 : "enter",
-  16 : "shift",
-  17 : "ctrl",
-  18 : "alt",
-  19 : "pause/break",
-  20 : "caps lock",
-  27 : "escape",
-  33 : "page up",
-  34 : "page down",
-  35 : "end",
-  36 : "home",
-  37 : "left arrow",
-  38 : "up arrow",
-  39 : "right arrow",
-  40 : "down arrow",
-  45 : "insert",
-  46 : "delete",
-  91 : "left window",
-  92 : "right window",
-  93 : "select key",
-  96 : "numpad 0",
-  97 : "numpad 1",
-  98 : "numpad 2",
-  99 : "numpad 3",
-  100 : "numpad 4",
-  101 : "numpad 5",
-  102 : "numpad 6",
-  103 : "numpad 7",
-  104 : "numpad 8",
-  105 : "numpad 9",
-  106 : "multiply",
-  107 : "add",
-  109 : "subtract",
-  110 : "decimal point",
-  111 : "divide",
-  112 : "F1",
-  113 : "F2",
-  114 : "F3",
-  115 : "F4",
-  116 : "F5",
-  117 : "F6",
-  118 : "F7",
-  119 : "F8",
-  120 : "F9",
-  121 : "F10",
-  122 : "F11",
-  123 : "F12",
-  144 : "num lock",
-  145 : "scroll lock",
-  186 : ";",
-  187 : "=",
-  188 : ",",
-  189 : "-",
-  190 : ".",
-  191 : "/",
-  192 : "`",
-  219 : "[",
-  220 : "\\",
-  221 : "]",
-  222 : "'"
-};
+/*jslint browser: true, devel: true, plusplus: true, regexp: true, maxerr: 50, indent: 2 */
+/*globals chrome */
 
-function stringFromCharCode(code) {
-  return charMap[code] || String.fromCharCode(code);
-}
+(function () {
+  "use strict";
 
-// Saves options to localStorage.
-function save_options() {
-  localStorage["keycode"] = keyValue.value;
-  localStorage["boxsize"] = boxSizeW.value.replace(/[^\d]/g, '') + ',' + boxSizeH.value.replace(/[^\d]/g, '');
+  var warn = true, save = true, modify = true, warnYes, warnNo, saveYes, saveNo, modifyYes, modifyNo, boxSize, boxSizeH, boxSizeW;
 
-  if (warnYes.checked) {
-    localStorage["warn"] = true;
-  } else {
-    localStorage["warn"] = false;
+  // Saves options to localStorage.
+  function save_options() {
+    localStorage.warn = !!warnYes.checked;
+    localStorage.save = !!saveYes.checked;
+    localStorage.modify = !!modifyYes.checked;
+    localStorage.boxsize = boxSizeW.value.replace(/[^\d]/g, '') + ',' + boxSizeH.value.replace(/[^\d]/g, '');
+
+    alert('Changes Saved');
+    window.close();
   }
 
-  if (saveYes.checked) {
-    localStorage["save"] = true;
-  } else {
-    localStorage["save"] = false;
-  }
+  // Restores select box state to saved value from localStorage.
+  function restore_options() {
+    if (boxSize !== undefined) {
+      var boxSizes = boxSize.split(',');
+      boxSizeW.value = boxSizes[0];
+      boxSizeH.value = boxSizes[1];
+    }
 
-  if (modifyYes.checked) {
-    localStorage["modify"] = true;
-  } else {
-    localStorage["modify"] = false;
-  }
+    if (warn) {
+      warnYes.checked = true;
+    } else {
+      warnNo.checked = true;
+    }
 
-  alert('Changes Saved');
-  window.close();
-}
+    if (save) {
+      saveYes.checked = true;
+    } else {
+      saveNo.checked = true;
+    }
 
-// Restores select box state to saved value from localStorage.
-function restore_options() {
-  if (typeof save === "undefined") {
-    save = true;
-  }
-
-  if (typeof warn === "undefined") {
-    warn = true;
-  }
-
-  if (typeof modify === "undefined") {
-    modify = true;
-  }
-
-  if (typeof keyCommand === "undefined") {
-    keyCommand = 69;
-  }
-
-  if (typeof boxSize !== "undefined") {
-    var boxSizes = boxSize.split(',');
-    boxSizeW.value = boxSizes[0];
-    boxSizeH.value = boxSizes[1];
-  }
-
-  keyString.value = stringFromCharCode(keyCommand);
-  keyValue.value = keyCommand;
-
-  if (warn === "true") {
-    warnYes.checked = true;
-  } else {
-    warnNo.checked = true;
-  }
-
-  if (save === "true") {
-    saveYes.checked = true;
-  } else {
-    saveNo.checked = true;
-  }
-
-  if (modify === "true") {
-    modifyYes.checked = true;
-  } else {
-    modifyNo.checked = true;
-  }
-}
-
-function init() {
-  keyCommand = localStorage["keycode"];
-  warn = localStorage["warn"];
-  save = localStorage["save"];
-  modify = localStorage["modify"];
-  boxSize = localStorage["boxsize"];
-
-  keyString = document.getElementById('keycode-string');
-  keyValue = document.getElementById('keycode-value');
-  warnYes = document.getElementById('warn-yes');
-  warnNo = document.getElementById('warn-no');
-  saveYes = document.getElementById('save-yes');
-  saveNo = document.getElementById('save-no');
-  modifyYes = document.getElementById('modify-yes');
-  modifyNo = document.getElementById('modify-no');
-  boxSizeH = document.getElementById('box-size-h');
-  boxSizeW = document.getElementById('box-size-w');
-
-  var objects = document.getElementsByTagName('*'), i;
-  for(i = 0; i < objects.length; i++) {
-    if (objects[i].dataset && objects[i].dataset.message) {
-      objects[i].innerHTML = chrome.i18n.getMessage(objects[i].dataset.message);
+    if (modify) {
+      modifyYes.checked = true;
+    } else {
+      modifyNo.checked = true;
     }
   }
 
-  var button = document.getElementById('save-button');
-  button.onclick = function () { save_options(); };
+  function applyTranslations() {
+    var objects = document.getElementsByTagName('*'), i;
 
-  restore_options();
-}
+    for (i = 0; i < objects.length; i++) {
+      if (objects[i].dataset && objects[i].dataset.message) {
+        objects[i].innerHTML = chrome.i18n.getMessage(objects[i].dataset.message);
+      }
+    }
+  }
 
-function getKeyCode(e) {
-  keyString.value = stringFromCharCode(e.keyCode);
-  keyValue.value = e.keyCode;
-  return false;
-}
+  function init() {
+    var button = document.getElementById('save-button');
 
-window.onload = function () {
-  init();
-}
+    button.onclick = function () { save_options(); };
+
+    warn = localStorage.warn === "true";
+    save = localStorage.save === "true";
+    modify = localStorage.modify === "true";
+    boxSize = localStorage.boxsize;
+
+    warnYes = document.getElementById('warn-yes');
+    warnNo = document.getElementById('warn-no');
+    saveYes = document.getElementById('save-yes');
+    saveNo = document.getElementById('save-no');
+    modifyYes = document.getElementById('modify-yes');
+    modifyNo = document.getElementById('modify-no');
+    boxSizeH = document.getElementById('box-size-h');
+    boxSizeW = document.getElementById('box-size-w');
+
+    applyTranslations();
+    restore_options();
+  }
+
+  window.onload = function () {
+    init();
+  };
+}());
