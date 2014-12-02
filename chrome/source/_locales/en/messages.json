@@ -18,5 +18,7 @@
   "buttonLabelClose": { "message": "Close Editor", "description": "The hover text for the close button" },
   "buttonLabelBottom": { "message": "Toggle top / bottom position", "description": "The hover text for the top/bottom position button" },
   "buttonLabelLeftRight": { "message": "Toggle left / right position", "description": "The hover text for the left/right position button" },
-  "buttonLabelReset": { "message": "Reset the box size", "description": "The hover text for the reset box size button" }
+  "buttonLabelReset": { "message": "Reset the box size", "description": "The hover text for the reset box size button" },
+  "errorChromeURL": { "message": "Live CSS Editor does not work on the Chrome Extensions page. You should try it on a regular website.", "description": "Error message shown to a user when trying to use the extension on a chrome:// URL." },
+  "errorFileURL": { "message": "Please allow access to file URLs in the extensions screen and then try again.", "description": "Error message shown to a user when trying to use the extension on a file:// URL without permissions." }
 }

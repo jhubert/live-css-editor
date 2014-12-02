@@ -205,6 +205,18 @@ var LiveCSSEditor = function (settings) {
     return true;
   }
 
+  function saveBoxSize() {
+    var boxSize = currentBoxSize();
+
+    if (boxSize === ',') {
+      unsetStorage('boxsize');
+    } else {
+      setStorage('boxsize', currentBoxSize());
+    }
+
+    return true;
+  }
+
   function resetCSSTag() {
     var css = getEl('PageCSS');
 
@@ -214,7 +226,7 @@ var LiveCSSEditor = function (settings) {
   }
 
   function removeEditor() {
-    var panel = getEl('panel'), code = getEl('code'), boxSize = currentBoxSize();
+    var panel = getEl('panel'), code = getEl('code');
 
     if (settings.save !== true && settings.warn === true && code.value !== '') {
       if (!confirm(chrome.i18n.getMessage("warningOnClose"))) {
@@ -222,11 +234,7 @@ var LiveCSSEditor = function (settings) {
       }
     }
 
-    if (boxSize === ',') {
-      unsetStorage('boxsize');
-    } else {
-      setStorage('boxsize', currentBoxSize());
-    }
+    saveBoxSize();
 
     resetCSSTag();
     panel.parentElement.removeChild(panel);
