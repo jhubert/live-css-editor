@@ -40,7 +40,8 @@ function injectEditor() {
   var warn = getItem('warn') === "true" ? true : false,
     save = getItem('save') === "true" ? true : false,
     modify = getItem('modify') === "true" ? true : false,
-    code = "LiveCSSEditor({ warn : " + warn + ", save : " + save + ", modify : " + modify + " });";
+    boxsize = getItem('boxsize'),
+    code = "LiveCSSEditor({ warn : " + warn + ", save : " + save + ", modify : " + modify + ", boxsize : '" + boxsize + "' });";
 
   chrome.tabs.executeScript(null, {file: "css_editor.js"}, function (response) {
     chrome.tabs.executeScript(null, {code: code});
