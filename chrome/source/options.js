@@ -6,6 +6,10 @@
 
   var warn = true, save = true, modify = true, warnYes, warnNo, saveYes, saveNo, modifyYes, modifyNo, boxSize, boxSizeH, boxSizeW;
 
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
   // Saves options to localStorage.
   function save_options() {
     localStorage.warn = !!warnYes.checked;
@@ -55,23 +59,36 @@
   }
 
   function init() {
-    var button = document.getElementById('save-button');
+    var button = byId('save-button');
 
     button.onclick = function () { save_options(); };
 
-    warn = localStorage.warn === "true";
-    save = localStorage.save === "true";
-    modify = localStorage.modify === "true";
-    boxSize = localStorage.boxsize;
+    console.log('hello');
+    if (localStorage.hasOwnProperty('warn')) {
+      console.log('hi');
+      warn = localStorage.warn === "true";
+    }
 
-    warnYes = document.getElementById('warn-yes');
-    warnNo = document.getElementById('warn-no');
-    saveYes = document.getElementById('save-yes');
-    saveNo = document.getElementById('save-no');
-    modifyYes = document.getElementById('modify-yes');
-    modifyNo = document.getElementById('modify-no');
-    boxSizeH = document.getElementById('box-size-h');
-    boxSizeW = document.getElementById('box-size-w');
+    if (localStorage.hasOwnProperty('save')) {
+      save = localStorage.save === "true";
+    }
+
+    if (localStorage.hasOwnProperty('modify')) {
+      modify = localStorage.modify === "true";
+    }
+
+    if (localStorage.hasOwnProperty('boxsize')) {
+      boxSize = localStorage.boxsize;
+    }
+
+    warnYes = byId('warn-yes');
+    warnNo = byId('warn-no');
+    saveYes = byId('save-yes');
+    saveNo = byId('save-no');
+    modifyYes = byId('modify-yes');
+    modifyNo = byId('modify-no');
+    boxSizeH = byId('box-size-h');
+    boxSizeW = byId('box-size-w');
 
     applyTranslations();
     restore_options();
