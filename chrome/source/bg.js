@@ -69,9 +69,6 @@
       if (request.modify) {
         loadExistingStyle(sender.tab.id);
       }
-      if (request.openExtensions) {
-        alert('hi');
-      }
       sendResponse({});
     }
   );
