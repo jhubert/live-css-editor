@@ -1,4 +1,4 @@
-var keyCommand, warn, save, modify, keyString, keyValue, warnYes, warnNo, saveYes, saveNo, modifyYes, modifyNo, charMap = {
+var keyCommand, warn, save, modify, keyString, keyValue, warnYes, warnNo, saveYes, saveNo, modifyYes, modifyNo, boxSize, boxSizeH, boxSizeW, charMap = {
   8 : "backspace",
   9 : "tab",
   13 : "enter",
@@ -70,6 +70,7 @@ function stringFromCharCode(code) {
 // Saves options to localStorage.
 function save_options() {
   localStorage["keycode"] = keyValue.value;
+  localStorage["boxsize"] = boxSizeW.value.replace(/[^\d]/g, '') + ',' + boxSizeH.value.replace(/[^\d]/g, '');
 
   if (warnYes.checked) {
     localStorage["warn"] = true;
@@ -111,6 +112,12 @@ function restore_options() {
     keyCommand = 69;
   }
 
+  if (typeof boxSize !== "undefined") {
+    var boxSizes = boxSize.split(',');
+    boxSizeW.value = boxSizes[0];
+    boxSizeH.value = boxSizes[1];
+  }
+
   keyString.value = stringFromCharCode(keyCommand);
   keyValue.value = keyCommand;
 
@@ -138,6 +145,8 @@ function init() {
   warn = localStorage["warn"];
   save = localStorage["save"];
   modify = localStorage["modify"];
+  boxSize = localStorage["boxsize"];
+
   keyString = document.getElementById('keycode-string');
   keyValue = document.getElementById('keycode-value');
   warnYes = document.getElementById('warn-yes');
@@ -146,6 +155,8 @@ function init() {
   saveNo = document.getElementById('save-no');
   modifyYes = document.getElementById('modify-yes');
   modifyNo = document.getElementById('modify-no');
+  boxSizeH = document.getElementById('box-size-h');
+  boxSizeW = document.getElementById('box-size-w');
 
   var objects = document.getElementsByTagName('*'), i;
   for(i = 0; i < objects.length; i++) {

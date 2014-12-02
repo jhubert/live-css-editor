@@ -3,7 +3,7 @@
 var LiveCSSEditor = function (settings) {
   "use strict";
 
-  settings = settings || { warn: true, save: true, modify: true };
+  settings = settings || { warn: true, save: true, modify: true, boxsize: null };
 
   var cssCache = '',
     keyupTimer = null,
@@ -109,8 +109,6 @@ var LiveCSSEditor = function (settings) {
   function getStorage(key) {
     if (settings.save === true) {
       return window.localStorage.getItem('livecsseditor-' + key + '-' + urlKey);
-    } else {
-      return false;
     }
   }
 
@@ -118,9 +116,12 @@ var LiveCSSEditor = function (settings) {
     if (settings.save === true) {
       window.localStorage.setItem('livecsseditor-' + key + '-' + urlKey, value);
       return true;
-    } else {
-      return false;
     }
+  }
+
+  function unsetStorage(key) {
+    window.localStorage.removeItem('livecsseditor-' + key + '-' + urlKey);
+    return true;
   }
 
   function toggleBottom() {
@@ -153,12 +154,53 @@ var LiveCSSEditor = function (settings) {
     setStorage('positionLR', position);
   }
 
-  function resetBoxSize() {
+  function getBoxSize() {
+    var values = ['', ''];
+
+    if (getStorage('boxsize') && getStorage('boxsize') !== ',') {
+      values = getStorage('boxsize').replace(/px/g, '').split(',');
+    } else if (settings.boxsize) {
+      values = settings.boxsize.split(',');
+    }
+
+    return values;
+  }
+
+  function currentBoxSize() {
+    var style = getEl('code').style,
+      width = parseInt(style.width, 10) || '',
+      height = parseInt(style.height, 10) || '';
+
+    return [width, height].join(',');
+  }
+
+  function setBoxSize(boxsize) {
     var code = getEl('code');
 
-    code.style.width = '';
-    code.style.height = '';
-    setStorage('boxsize', null);
+    code.style.width = (boxsize[0] && boxsize[0] + 'px') || '';
+    code.style.height = (boxsize[1] && boxsize[1] + 'px') || '';
+
+    return true;
+  }
+
+  function resetBoxSize() {
+    var boxsize,
+      code = getEl('code'),
+      defaultBoxSize = settings && settings.boxsize;
+
+    // If the user hits resize when it's already at the default box size
+    // remove the sizing entirely to allow them to resize with the handler
+    if (!getStorage('boxsize') && currentBoxSize() === defaultBoxSize) {
+      code.style.width = '';
+      code.style.height = '';
+      return true;
+    }
+
+    unsetStorage('boxsize');
+
+    boxsize = getBoxSize();
+
+    setBoxSize(boxsize);
 
     return true;
   }
@@ -172,7 +214,7 @@ var LiveCSSEditor = function (settings) {
   }
 
   function removeEditor() {
-    var panel = getEl('panel'), code = getEl('code');
+    var panel = getEl('panel'), code = getEl('code'), boxSize = currentBoxSize();
 
     if (settings.save !== true && settings.warn === true && code.value !== '') {
       if (!confirm(chrome.i18n.getMessage("warningOnClose"))) {
@@ -180,7 +222,11 @@ var LiveCSSEditor = function (settings) {
       }
     }
 
-    setStorage('boxsize', code.style.width + ',' + code.style.height);
+    if (boxSize === ',') {
+      unsetStorage('boxsize');
+    } else {
+      setStorage('boxsize', currentBoxSize());
+    }
 
     resetCSSTag();
     panel.parentElement.removeChild(panel);
@@ -221,7 +267,6 @@ var LiveCSSEditor = function (settings) {
 
   function addEditorPane() {
     var objPanel = document.createElement('div'),
-      boxsize = getStorage('boxsize') && getStorage('boxsize').split(','),
       code;
 
     objPanel.setAttribute('id', 'LiveCSSEditor-panel');
@@ -231,6 +276,8 @@ var LiveCSSEditor = function (settings) {
 
     code = getEl('code');
 
+    setBoxSize(getBoxSize());
+
     if (getStorage('position') === 'bottom') {
       toggleBottom();
     }
@@ -239,11 +286,6 @@ var LiveCSSEditor = function (settings) {
     addClass(objPanel, 'right');
     if (getStorage('positionLR') === 'left') {
       toggleLeftRight();
-    }
-
-    if (boxsize) {
-      code.style.width = boxsize[0];
-      code.style.height = boxsize[1];
     }
 
     activateButtons();
